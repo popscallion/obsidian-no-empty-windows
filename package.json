@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
+	"name": "obsidian-no-empty-windows",
 	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"description": "Closes Obsidian window with cmd+W on Mac when the last tab is closed.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
