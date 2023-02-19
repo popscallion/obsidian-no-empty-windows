@@ -1,5 +1,5 @@
 {
-	"name": "obsidian-no-empty-windows",
+	"name": "no-empty-windows",
 	"version": "1.0.0",
 	"description": "Closes Obsidian window with cmd+W on Mac when the last tab is closed.",
 	"main": "main.js",
