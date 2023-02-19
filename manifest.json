@@ -1,5 +1,5 @@
 {
-	"id": "obsidian-no-empty-windows",
+	"id": "no-empty-windows",
 	"name": "No Empty Windows",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
