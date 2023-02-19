@@ -1,4 +1,4 @@
-# obsidian-no-empty-windows
+# no-empty-windows
 
 This plugin provides an alternative to the "Close current tab" command in Obsidian ("workspace:close"), and makes Obsidian windows behave more like MacOS browser windows.
 
