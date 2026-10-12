@@ -1,5 +1,6 @@
 import {
   App,
+  Platform,
   Plugin,
   PluginSettingTab,
   Setting,
@@ -71,13 +72,13 @@ export default class NoEmptyWindows extends Plugin {
             break;
           case leaves.length === 1 &&
             activeLeaf!.view.getViewType() === "empty":
-            activeLeaf!.getContainer().win.close();
+            this.closeOrHide(activeLeaf!.getContainer().win);
             break;
           case leaves.length === 1 &&
             (!this.settings.allowEmpty ||
               (this.settings.allowEmpty &&
                 activeLeaf!.view.getViewType() === "empty")):
-            activeLeaf!.getContainer().win.close();
+            this.closeOrHide(activeLeaf!.getContainer().win);
             break;
           case leaves.length > 1 && activeGroup.children.length === 1:
             const relatives = activeGroup.parent.children;
@@ -100,6 +101,16 @@ export default class NoEmptyWindows extends Plugin {
         }
       },
     });
+  }
+  // Closing the main window quits the vault (cold start on relaunch), so on
+  // macOS hide the app instead (same as Cmd+H). Popout windows close normally.
+  closeOrHide(win: Window) {
+    if (Platform.isMacOS && win === window) {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      require("electron").remote.app.hide();
+    } else {
+      win.close();
+    }
   }
   onunload() {}
   async loadSettings() {
