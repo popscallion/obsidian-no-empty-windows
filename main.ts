@@ -1,5 +1,6 @@
 import {
   App,
+  Platform,
   Plugin,
   PluginSettingTab,
   Setting,
@@ -71,13 +72,13 @@ export default class NoEmptyWindows extends Plugin {
             break;
           case leaves.length === 1 &&
             activeLeaf!.view.getViewType() === "empty":
-            activeLeaf!.getContainer().win.close();
+            this.closeOrHide(activeLeaf!.getContainer().win);
             break;
           case leaves.length === 1 &&
             (!this.settings.allowEmpty ||
               (this.settings.allowEmpty &&
                 activeLeaf!.view.getViewType() === "empty")):
-            activeLeaf!.getContainer().win.close();
+            this.closeOrHide(activeLeaf!.getContainer().win);
             break;
           case leaves.length > 1 && activeGroup.children.length === 1:
             const relatives = activeGroup.parent.children;
@@ -100,6 +101,35 @@ export default class NoEmptyWindows extends Plugin {
         }
       },
     });
+  }
+  // Closing the main window quits the vault (cold start on relaunch), so on
+  // macOS hide the app instead (same as Cmd+H). Popout windows close normally.
+  // Falls back to win.close() if Electron's remote module is unavailable.
+  closeOrHide(win: Window) {
+    const app = Platform.isMacOS && win === window ? this.getElectronApp() : null;
+    if (app) {
+      app.hide();
+    } else {
+      win.close();
+    }
+  }
+  // Newer Obsidian builds ship @electron/remote; older ones expose it as
+  // electron.remote.
+  getElectronApp(): { hide(): void } | null {
+    const req = (window as unknown as { require?: (id: string) => any })
+      .require;
+    for (const load of [
+      () => req?.("@electron/remote"),
+      () => req?.("electron")?.remote,
+    ]) {
+      try {
+        const app = load()?.app;
+        if (typeof app?.hide === "function") return app;
+      } catch (e) {
+        // module not available, try the next source
+      }
+    }
+    return null;
   }
   onunload() {}
   async loadSettings() {
